@@ -5,8 +5,9 @@ interface VisibilitySheetProps {
   onClose: () => void;
   onPublish: (visibility: string) => void;
   summary: {
-    question: string;
-    answer: string;
+    count: number;
+    question?: string;
+    answer?: string;
   };
 }
 
@@ -39,8 +40,8 @@ export const VisibilitySheet: React.FC<VisibilitySheetProps> = ({
         <div className="mb-8">
           <h3 className="text-sm font-semibold text-gray-400 mb-2">기록 요약</h3>
           <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-            <p className="text-sm font-bold text-gray-900 mb-1">{summary.question}</p>
-            <p className="text-sm text-gray-600 line-clamp-2">{summary.answer}</p>
+            <p className="text-sm font-bold text-gray-900">총 {summary.count}개의 답변을 발행합니다.</p>
+            <p className="text-xs text-gray-500 mt-1">선택한 공개 범위로 모든 답변이 저장됩니다.</p>
           </div>
         </div>
 

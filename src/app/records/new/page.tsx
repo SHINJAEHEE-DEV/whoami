@@ -9,27 +9,29 @@ import { recordService } from '@/services/recordService';
 export default function NewRecordPage() {
   const router = useRouter();
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<{ question: string; answer: string; type: string } | null>(null);
+  const [answeredQuestions, setAnsweredQuestions] = useState<any[]>([]);
 
-  const handleWizardComplete = (question: string, answer: string, type: string) => {
-    setCurrentRecord({ question, answer, type });
+  const handleWizardComplete = (answers: any[]) => {
+    setAnsweredQuestions(answers);
     setIsVisibilityOpen(true);
   };
 
   const handlePublish = async (visibility: any) => {
-    if (!currentRecord) return;
+    if (answeredQuestions.length === 0) return;
     
     try {
-      await recordService.createRecord(
-        currentRecord.question,
-        currentRecord.answer,
-        visibility,
-        currentRecord.type
+      await recordService.createRecords(
+        answeredQuestions.map(q => ({
+          question: q.question,
+          answer: q.answer,
+          visibility,
+          question_type: q.type
+        }))
       );
       router.push('/');
       router.refresh();
     } catch (error) {
-      console.error('Failed to publish record:', error);
+      console.error('Failed to publish records:', error);
       alert('저장에 실패했습니다.');
     }
   };
@@ -38,12 +40,12 @@ export default function NewRecordPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <WritingWizard onComplete={handleWizardComplete} />
       
-      {currentRecord && (
+      {answeredQuestions.length > 0 && (
         <VisibilitySheet
           isOpen={isVisibilityOpen}
           onClose={() => setIsVisibilityOpen(false)}
           onPublish={handlePublish}
-          summary={{ question: currentRecord.question, answer: currentRecord.answer }}
+          summary={{ count: answeredQuestions.length }}
         />
       )}
     </div>
