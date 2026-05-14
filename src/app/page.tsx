@@ -21,6 +21,11 @@ export default function Home() {
       if (!session) {
         router.push('/login');
       } else {
+        const hasRecords = await recordService.hasRecords();
+        if (!hasRecords) {
+          router.push('/records/new');
+          return;
+        }
         await fetchFeed();
       }
       setLoading(false);
