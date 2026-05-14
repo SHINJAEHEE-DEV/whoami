@@ -14,6 +14,12 @@ export interface Record {
   };
 }
 
+const getCurrentUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('로그인이 필요합니다.');
+  return user;
+};
+
 export const recordService = {
   /**
    * 홈 피드에 표시할 기록들을 가져옵니다.
@@ -48,8 +54,7 @@ export const recordService = {
     visibility: Record['visibility'] = 'private',
     question_type: string = 'free-text'
   ) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('로그인이 필요합니다.');
+    const user = await getCurrentUser();
 
     const { data, error } = await supabase
       .from('records')
@@ -62,6 +67,31 @@ export const recordService = {
       })
       .select()
       .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * 여러 개의 새로운 기록을 한꺼번에 작성합니다.
+   */
+  async createRecords(records: { 
+    question: string; 
+    answer: string; 
+    visibility: Record['visibility'];
+    question_type: string;
+  }[]) {
+    const user = await getCurrentUser();
+
+    const recordsWithUserId = records.map(r => ({
+      ...r,
+      user_id: user.id
+    }));
+
+    const { data, error } = await supabase
+      .from('records')
+      .insert(recordsWithUserId)
+      .select();
 
     if (error) throw error;
     return data;
