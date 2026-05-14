@@ -1,0 +1,14 @@
+# AI ACTION LOGS
+- [2026-05-14] Initialized project documentation structure.
+- [2026-05-14] Updated project overview and mission constraints in CONSTITUTION documents.
+- [2026-05-14] Refactored data model to support multi-group sharing for records (introduced `record_group_access`).
+- [2026-05-14] Implemented `authService` and `memberService` for Authentication and Profile management.
+- [2026-05-14] Added DB trigger for automatic profile creation on signup.
+- [2026-05-14] Implemented Signup and Login UI using Next.js App Router and Tailwind CSS.
+- [2026-05-14] Refactored project directory structure, moving core logic to `src/` directory.
+- [2026-05-14] Implemented `recordService` for managing autobiography entries.
+- [2026-05-14] Created `Navbar` component and implemented Home Feed UI in `src/app/page.tsx`.
+- [2026-05-14] Enforced login on entry: Redirected unauthenticated users from Home to Login.
+- [2026-05-14] Updated `package.json` with `@supabase/supabase-js` and stabilized `src/app/page.tsx` code.
+- [2026-05-14] Created `.env.local` with Supabase development credentials.
+- [2026-05-14] Created `PROJECT_SUMMARY.md` consolidating planning, MVP features, DB design, and progress.
