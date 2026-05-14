@@ -29,61 +29,61 @@ export const VisibilitySheet: React.FC<VisibilitySheetProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 transition-opacity">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 transition-opacity backdrop-blur-sm">
       <div 
         className="fixed inset-0" 
         onClick={onClose}
       />
-      <div className="relative w-full max-w-md bg-white rounded-t-3xl p-6 animate-in slide-in-from-bottom duration-300">
-        <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" />
+      <div className="relative w-full max-w-md bg-[#FCFBF8] rounded-t-[32px] p-6 sm:p-8 animate-in slide-in-from-bottom duration-300 border-t border-[#F5F3EF]">
+        <div className="w-12 h-1.5 bg-[#E0DCD3] rounded-full mx-auto mb-8" />
         
-        <div className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-400 mb-2">기록 요약</h3>
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-            <p className="text-sm font-bold text-gray-900">총 {summary.count}개의 답변을 발행합니다.</p>
-            <p className="text-xs text-gray-500 mt-1">선택한 공개 범위로 모든 답변이 저장됩니다.</p>
-          </div>
+        <div className="mb-8 text-center">
+          <h2 className="text-xl font-bold tracking-tight text-[#1C1C1C] mb-2">공개 범위 설정</h2>
+          <p className="text-sm text-[#9E9E9E]">작성하신 {summary.count}개의 답변을 누구와 나눌까요?</p>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-sm font-semibold text-gray-400 mb-4">공개 설정</h3>
+        <div className="mb-10">
           <div className="space-y-3">
             {visibilityOptions.map((option) => (
               <button
                 key={option.id}
                 onClick={() => setVisibility(option.id)}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
+                className={`w-full flex items-center justify-between p-5 rounded-[20px] border-2 transition-all duration-200 ${
                   visibility === option.id
-                    ? 'border-black bg-black text-white'
-                    : 'border-gray-50 bg-gray-50 hover:border-gray-100'
+                    ? 'border-[#1C1C1C] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.04)]'
+                    : 'border-transparent bg-[#FAFAFA] hover:bg-[#F5F3EF]'
                 }`}
               >
                 <div className="text-left">
-                  <p className="font-bold text-sm">{option.label}</p>
-                  <p className={`text-xs ${visibility === option.id ? 'text-gray-300' : 'text-gray-400'}`}>
+                  <p className="font-bold text-[#1C1C1C]">{option.label}</p>
+                  <p className="text-xs text-[#9E9E9E] mt-0.5">
                     {option.description}
                   </p>
                 </div>
-                {visibility === option.id && (
-                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
-                    <div className="w-2.5 h-2.5 bg-black rounded-full" />
-                  </div>
-                )}
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                  visibility === option.id 
+                    ? 'border-[#1C1C1C] bg-[#1C1C1C]' 
+                    : 'border-[#E0DCD3]'
+                }`}>
+                  {visibility === option.id && (
+                    <div className="w-2.5 h-2.5 bg-white rounded-full" />
+                  )}
+                </div>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <button
             onClick={onClose}
-            className="flex-1 py-4 rounded-2xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+            className="flex-1 py-4 rounded-full font-bold text-sm bg-[#F5F3EF] text-[#666666] hover:bg-[#EBE7DF] transition-all"
           >
             취소
           </button>
           <button
             onClick={() => onPublish(visibility)}
-            className="flex-[2] py-4 rounded-2xl font-bold bg-black text-white hover:bg-gray-900 transition-all"
+            className="flex-[2] py-4 rounded-full font-bold text-sm bg-[#1C1C1C] text-white hover:scale-[1.02] active:scale-[0.98] shadow-lg transition-all"
           >
             기록하기
           </button>
