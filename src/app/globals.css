@@ -9,6 +9,15 @@
   --color-brand-border: #F5F3EF;
 }
 
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--color-brand-warm);
   color: var(--color-brand-primary);
