@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { WritingWizard, AnsweredQuestion } from '@/components/records/WritingWizard';
 import { VisibilitySheet } from '@/components/records/VisibilitySheet';
 import { recordService, Record } from '@/services/recordService';
+import { questionService, Question } from '@/services/questionService';
 
 const STORAGE_KEY = 'whoami_onboarding_answers';
 
@@ -13,40 +14,50 @@ export default function NewRecordPage() {
   const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<AnsweredQuestion[]>([]);
   const [initialAnswers, setInitialAnswers] = useState<string[] | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // localStorage에서 이전 답변 불러오기 및 기존 기록 확인
+  // 데이터 로드 및 초기화
   useEffect(() => {
     const init = async () => {
-      // 이미 기록이 있는지 확인 (중복 온보딩 방지)
       try {
+        // 1. 기존 기록 확인 (중복 온보딩 방지)
         const hasRecords = await recordService.hasRecords();
         if (hasRecords) {
           router.replace('/');
           return;
         }
-      } catch (e) {
-        console.error('Failed to check existing records', e);
-      }
 
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          setInitialAnswers(JSON.parse(saved));
-        } catch (e) {
-          console.error('Failed to parse saved answers', e);
+        // 2. 질문 목록 가져오기
+        const questionsData = await questionService.getQuestions();
+        
+        // 배포 전까지 테스트를 위해 10개로 제한
+        const limitedQuestions = questionsData.slice(0, 10);
+        setQuestions(limitedQuestions);
+
+        // 3. localStorage에서 이전 답변 불러오기
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            setInitialAnswers(JSON.parse(saved));
+          } catch (e) {
+            console.error('Failed to parse saved answers', e);
+          }
         }
+      } catch (e) {
+        console.error('Initialization failed', e);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     init();
   }, [router]);
 
-  const handleProgressUpdate = (answers: string[]) => {
+  const handleProgressUpdate = useCallback((answers: string[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
-  };
+  }, []);
 
   const handleWizardComplete = (answers: AnsweredQuestion[]) => {
     setAnsweredQuestions(answers);
@@ -92,6 +103,7 @@ export default function NewRecordPage() {
   return (
     <div className="min-h-svh bg-brand-warm">
       <WritingWizard 
+        questions={questions}
         onComplete={handleWizardComplete} 
         initialAnswers={initialAnswers || undefined}
         onProgressUpdate={handleProgressUpdate}

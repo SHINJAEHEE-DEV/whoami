@@ -74,6 +74,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Helper Function: has_group_access (SECURITY DEFINER to prevent infinite recursion)
+CREATE OR REPLACE FUNCTION public.has_group_access(p_record_id uuid, p_user_id uuid)
+RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.record_group_access rga
+    JOIN public.group_members gm ON rga.group_id = gm.group_id
+    WHERE rga.record_id = p_record_id AND gm.user_id = p_user_id
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- RLS Policies
 
 -- Profiles: Anyone can view, only owner can update
@@ -92,34 +104,22 @@ CREATE POLICY "Users can unfollow or update status" ON public.follows
 
 -- Records: Complex visibility
 CREATE POLICY "Owner can do everything with records" ON public.records
-  FOR ALL USING (auth.uid() = user_id);
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Viewable based on visibility level" ON public.records
   FOR SELECT USING (
     visibility = 'public' OR
     (visibility = 'mutual' AND public.is_mutual_follower(auth.uid(), user_id)) OR
-    (visibility = 'group' AND EXISTS (
-      SELECT 1 FROM public.record_group_access rga
-      JOIN public.group_members gm ON rga.group_id = gm.group_id
-      WHERE rga.record_id = id AND gm.user_id = auth.uid()
-    ))
+    (visibility = 'group' AND public.has_group_access(id, auth.uid()))
   );
 
--- Groups & Members: Owner manages, members see
+-- Groups & Members: Owner manages, members DO NOT see (Private Circle model)
 CREATE POLICY "Owners can manage groups" ON public.custom_groups
   FOR ALL USING (auth.uid() = owner_id);
-CREATE POLICY "Members can see group info" ON public.custom_groups
-  FOR SELECT USING (EXISTS (
-    SELECT 1 FROM public.group_members WHERE group_id = id AND user_id = auth.uid()
-  ));
 
 CREATE POLICY "Owners can manage group members" ON public.group_members
   FOR ALL USING (EXISTS (
     SELECT 1 FROM public.custom_groups WHERE id = group_id AND owner_id = auth.uid()
-  ));
-CREATE POLICY "Members can see other members" ON public.group_members
-  FOR SELECT USING (group_id IN (
-    SELECT group_id FROM public.group_members WHERE user_id = auth.uid()
   ));
 
 -- Record Group Access: Owner manages

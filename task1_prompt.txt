@@ -1,0 +1,127 @@
+@generalist "You are implementing Task 1: Data Model and Constants
+
+## Task Description
+
+**Files:**
+- Create: `src/constants/questions.ts`
+- Modify: `supabase/migrations/20260515000000_add_question_type.sql`
+
+- [ ] **Step 1: Create a migration to add `question_type` to `records` table**
+
+```sql
+ALTER TABLE public.records ADD COLUMN question_type text DEFAULT 'free-text';
+```
+
+- [ ] **Step 2: Run migration**
+
+Run: `npx supabase migration new add_question_type` (if using local supabase) or apply via dashboard. (Just create the file in this environment).
+
+- [ ] **Step 3: Define question constants and types**
+
+```typescript
+// src/constants/questions.ts
+export type QuestionType = 'free-text' | 'choice';
+
+export interface Question {
+  id: string;
+  category: '취향' | '가치관' | '컴플렉스' | '기타';
+  type: QuestionType;
+  text: string;
+  options?: string[];
+}
+
+export const QUESTIONS: Question[] = [
+  {
+    id: 'fav-food',
+    category: '취향',
+    type: 'choice',
+    text: '평생 한 가지만 먹어야 한다면?',
+    options: ['짬뽕', '짜장면']
+  },
+  {
+    id: 'dislike-food',
+    category: '취향',
+    type: 'free-text',
+    text: '남들은 좋아하는데 나만 도저히 못 먹는 음식이 있다면?'
+  },
+  {
+    id: 'complex-1',
+    category: '컴플렉스',
+    type: 'free-text',
+    text: '남들에게 완벽해 보이고 싶어 노력했던 순간은 언제인가요?'
+  },
+  {
+    id: 'value-success',
+    category: '가치관',
+    type: 'choice',
+    text: \"인생에서 '성공'보다 더 중요하다고 생각하는 가치는?\",
+    options: ['과정의 즐거움', '결과와 성취']
+  }
+];
+```
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add supabase/migrations src/constants/questions.ts
+git commit -m \"feat: add question metadata and types\"
+```
+
+## Context
+
+This is the first task of the Core Writing Feature. We are adding metadata to the `records` table to distinguish between different types of questions (free-text vs choice) and providing a set of initial questions.
+
+## Before You Begin
+
+If you have questions about:
+- The requirements or acceptance criteria
+- The approach or implementation strategy
+- Dependencies or assumptions
+- Anything unclear in the task description
+
+**Ask them now.** Raise any concerns before starting work.
+
+## Your Job
+
+Once you're clear on requirements:
+1. Implement exactly what the task specifies
+2. Write tests (following TDD if possible)
+3. Verify implementation works
+4. Commit your work
+5. Self-review (see below)
+6. Report back
+
+Work from: C:\\Users\\JaeHeeShin\\Desktop\\programmers\\whoami
+
+**While you work:** If you encounter something unexpected or unclear, **ask questions**.
+It's always OK to pause and clarify. Don't guess or make assumptions.
+
+## Code Organization
+
+- Follow the file structure defined in the plan
+- Each file should have one clear responsibility with a well-defined interface
+- In existing codebases, follow established patterns.
+
+## When You're in Over Your Head
+
+STOP and escalate when:
+- The task requires architectural decisions with multiple valid approaches
+- You need to understand code beyond what was provided and can't find clarity
+- You feel uncertain about whether your approach is correct
+
+## Before Reporting Back: Self-Review
+
+- Completeness: Did I fully implement everything in the spec?
+- Quality: Is the code clean and maintainable?
+- Discipline: Did I avoid overbuilding (YAGNI)?
+- Testing: Are tests comprehensive?
+
+## Report Format
+
+When done, report:
+- **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+- What you implemented
+- What you tested and test results
+- Files changed
+- Self-review findings (if any)
+- Any issues or concerns"

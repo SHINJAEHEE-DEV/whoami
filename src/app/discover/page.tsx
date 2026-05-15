@@ -91,7 +91,7 @@ export default function DiscoverPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => router.push(`/profile/${profile.username}`)}
+                      onClick={() => router.push(`/profile/${profile.id}`)}
                       className="px-6 py-2 bg-brand-warm text-brand-primary rounded-xl font-bold border border-brand-border hover:bg-brand-border transition-colors"
                     >
                       프로필 보기

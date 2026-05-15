@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Profile } from '@/services/memberService';
 
 interface RelationshipTabsProps {
@@ -42,22 +43,22 @@ export default function RelationshipTabs({ followers, following, onUnfollow }: R
       <ul className="space-y-4">
         {list.length > 0 ? (
           list.map((user) => (
-            <li key={user.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-brand-border">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-brand-warm border border-brand-border overflow-hidden relative">
+            <li key={user.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-brand-border hover:border-brand-primary transition-all">
+              <Link href={`/profile/${user.id}`} className="flex items-center space-x-3 group">
+                <div className="w-10 h-10 rounded-full bg-brand-warm border border-brand-border overflow-hidden relative group-hover:ring-2 group-hover:ring-brand-primary transition-all">
                   <img
                     src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
                     alt={user.username}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span className="font-bold text-brand-primary">@{user.username}</span>
-              </div>
+                <span className="font-bold text-brand-primary group-hover:text-brand-accent transition-colors">@{user.username}</span>
+              </Link>
               
               {activeTab === 'following' && (
                 <button
                   onClick={() => onUnfollow(user.id)}
-                  className="px-4 py-1.5 text-xs font-black text-brand-secondary border border-brand-border rounded-xl hover:bg-brand-warm hover:text-brand-primary transition-colors"
+                  className="px-4 py-1.5 text-xs font-black text-brand-secondary border border-brand-border rounded-xl hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-colors"
                 >
                   언팔로우
                 </button>

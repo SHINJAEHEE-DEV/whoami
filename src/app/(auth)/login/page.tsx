@@ -18,11 +18,17 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await authService.signIn(email, password);
+      const result = await authService.signIn(email, password);
+      console.log('Login success:', result);
       router.push('/');
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || '로그인 중 오류가 발생했습니다.');
+    } catch (err: unknown) {
+      console.error('Login error details:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('로그인 중 오류가 발생했습니다.');
+      }
     } finally {
       setLoading(false);
     }

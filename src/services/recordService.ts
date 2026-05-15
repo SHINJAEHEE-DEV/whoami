@@ -122,10 +122,36 @@ export const recordService = {
       throw new Error(error.message || '기록 저장 중 오류가 발생했습니다.');
     }
     return data;
-  },
+    },
 
-  /**
-   * 내 기록들만 가져옵니다.
+    /**
+    * 특정 사용자의 기록들을 가져옵니다.
+    * RLS에 의해 사용자가 볼 수 있는 기록만 필터링되어 반환됩니다.
+    */
+    async getUserRecords(userId: string): Promise<Record[]> {
+    const { data, error } = await supabase
+      .from('records')
+      .select(`
+        *,
+        profiles:user_id (
+          username,
+          avatar_url
+        )
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user records:', error);
+      throw error;
+    }
+
+    return data || [];
+    },
+
+    /**
+    * 특정 기록을 삭제합니다.
+
    */
   async getMyRecords(): Promise<Record[]> {
     const { data: { user } } = await supabase.auth.getUser();
@@ -164,7 +190,7 @@ export const recordService = {
   /**
    * 기록을 수정합니다.
    */
-  async updateRecord(id: string, updates: { answer?: string; visibility?: Record['visibility'] }) {
+  async updateRecord(id: string, updates: { question?: string; answer?: string; visibility?: Record['visibility'] }) {
     const { data, error } = await supabase
       .from('records')
       .update(updates)

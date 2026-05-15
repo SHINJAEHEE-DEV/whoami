@@ -1,4 +1,14 @@
 # AI ACTION LOGS
+- [2026-05-15] Digital Autobiography Implementation - Task 1:
+    - Added `updateRecord` method to `recordService.ts` for single record updates.
+    - Added unit tests for `updateRecord` in `recordService.test.ts` (success and failure cases).
+    - Verified implementation with `npm test`.
+- [2026-05-15] Verified and refined Phase 1 implementation:
+    - Fixed lint errors across multiple files (`page.tsx`, `new/page.tsx`, `login/page.tsx`, `signup/page.tsx`, `Navbar.tsx`, `recordService.test.ts`).
+    - Standardized types by replacing `any` with explicit interfaces and `User` types.
+    - Verified mobile-first layout and sequential Writing Wizard functionality.
+    - Successfully passed project verification: `npm run lint`, `npm run build`, and `npm test` all passing.
+    - Updated `TODO-DOING`, `TODO-READY`, and `TODO-DONE` to reflect current project state.
 - [2026-05-14] Initialized project documentation structure.
 - [2026-05-14] Updated project overview and mission constraints in CONSTITUTION documents.
 - [2026-05-14] Refactored data model to support multi-group sharing for records (introduced `record_group_access`).
@@ -12,3 +22,26 @@
 - [2026-05-14] Updated `package.json` with `@supabase/supabase-js` and stabilized `src/app/page.tsx` code.
 - [2026-05-14] Created `.env.local` with Supabase development credentials.
 - [2026-05-14] Created `PROJECT_SUMMARY.md` consolidating planning, MVP features, DB design, and progress.
+- [2026-05-15] Implemented Core Writing Feature:
+    - Added `question_type` migration and defined `QUESTIONS` constants.
+    - Updated `recordService` to support choice-based questions and record existence check.
+    - Developed `WritingWizard` and `VisibilitySheet` UI components with Tailwind CSS.
+    - Created `/records/new` page and implemented onboarding redirect on Home feed.
+    - Verified build integrity with `npm run build`.
+- [2026-05-15] Refined Writing Wizard Flow:
+    - Made the writing flow sequential through all questions (removed random swap).
+    - Added a progress bar and step counter to the `WritingWizard` component.
+    - Implemented batch submission: users now answer all questions before publishing.
+    - Added `createRecords` batch insertion method to `recordService` with Vitest coverage.
+- [2026-05-15] Applied Threads x MOODA Visual Design:
+    - Set warm background (`#FCFBF8`) and system font stack in global CSS.
+    - Updated `WritingWizard` with soft cards (24px radius), warm accents, and clean text.
+    - Enhanced UI with category-specific emojis and smooth progress transitions.
+    - Applied consistent styling to `VisibilitySheet` and global layout.
+- [2026-05-15] Finalized Core Onboarding Questionnaire functionality:
+    - Enhanced `recordService.createRecords` with robust validation for empty answers and visibility.
+    - Implemented auto-save mechanism using `localStorage` to persist progress during onboarding.
+    - Added `isSubmitting` state and full-screen loading overlay for smooth saving transition.
+    - Implemented automatic redirection to home and data refresh upon successful submission.
+    - Added redirection logic to prevent users with existing records from accessing the onboarding page.
+    - Updated `WritingWizard` to support `initialAnswers` and `onProgressUpdate` for state persistence.

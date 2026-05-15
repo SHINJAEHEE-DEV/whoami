@@ -2,5 +2,33 @@
 - [x] Initialize project context and documentation structure.
 - [x] Phase 1: 회원가입 및 프로필 자동 생성 기능 구현 (DB 트리거 및 서비스 계층)
 - [x] Phase 1: 회원가입 및 로그인 UI 연동 완료
-- [x] Phase 1: 메인 홈 피드 UI 및 기록 조회 기능 구현
+- [x] Phase 1: 메인 홈 피드 UI 및 기록 조회 기능 구현 (기존)
 - [x] Create comprehensive `PROJECT_SUMMARY.md` (Planning, MVP, DB, Progress).
+- [x] Implement Core Writing Feature (Focused Wizard UI).
+- [x] Add `question_type` to DB schema and support choice-based questions.
+- [x] Implement onboarding redirect for users without records.
+- [x] Task 1: Mobile-First Global Layout Update (Full-screen h-svh)
+- [x] Task 2: Update recordService (Batch insert support)
+- [x] Task 3: Writing Wizard UI Refinement (Sequential flow, Progress bar, Mobile optimization)
+- [x] Task 4: New Record Page and Onboarding Redirect verification
+- [x] Task 5: Project Verification (Lint, Build, Test passing)
+- [x] **Digital Autobiography Refactoring**:
+    - [x] Refactor Home page to personal autobiography view (removed feed).
+    - [x] Implement `BookViewer` (Book mode) and `ListViewer` (List mode).
+    - [x] Add `updateRecord` to `recordService` for editing answers and visibility.
+    - [x] Implement `EditRecordModal` for inline editing of autobiography pages.
+    - [x] Fix RLS infinite recursion issues and verify local Supabase integration.
+- [x] **70-Item Questionnaire Integration**:
+    - [x] Documented full question list in `docs/QUESTIONS-LIST.md`.
+    - [x] Created `questions` table and seeded 70 items.
+    - [x] Implemented Stage Transition logic with encouraging messages.
+- [x] **Connections & Sharing Flow**:
+    - [x] Extended `memberService` with follow/unfollow and relationship check.
+    - [x] Implemented `/discover` page for user search.
+    - [x] Implemented dynamic `/profile/[id]` for viewing others' autobiographies.
+    - [x] Secured autobiography viewing via Supabase RLS (filtered by relationship).
+- [x] **Group Management (Private Circles)**:
+    - [x] Created `groupService` for group CRUD and member synchronization.
+    - [x] Implemented `/groups` dashboard for managing private circles.
+    - [x] Implemented 2-step `CreateGroupWizard` (Name -> Member Selection).
+    - [x] Verified group-based sharing logic integration.

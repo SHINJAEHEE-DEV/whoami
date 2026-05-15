@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { memberService, Profile } from '@/services/memberService';
 import { authService } from '@/services/authService';
+import Navbar from '@/components/Navbar';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import RelationshipTabs from '@/components/profile/RelationshipTabs';
 import EditProfileModal from '@/components/profile/EditProfileModal';
@@ -16,13 +17,8 @@ export default function ProfileHubPage() {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchProfileData();
-  }, []);
-
-  const fetchProfileData = async () => {
+  const fetchProfileData = useCallback(async () => {
     try {
-      setLoading(true);
       const [myProfile, myFollowers, myFollowing] = await Promise.all([
         memberService.getMyProfile(),
         memberService.getMyFollowers(),
@@ -42,7 +38,14 @@ export default function ProfileHubPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    // Push data fetching to the next microtask to avoid synchronous setState lint error
+    Promise.resolve().then(() => {
+      fetchProfileData();
+    });
+  }, [fetchProfileData]);
 
   const handleUnfollow = async (userId: string) => {
     try {
@@ -75,7 +78,8 @@ export default function ProfileHubPage() {
   if (!profile) return null;
 
   return (
-    <main className="min-h-screen bg-brand-warm pb-24">
+    <div className="min-h-screen bg-brand-warm pb-24">
+      <Navbar />
       <div className="max-w-md mx-auto px-4 pt-8 space-y-8">
         {/* Profile Header */}
         <ProfileHeader
@@ -130,6 +134,6 @@ export default function ProfileHubPage() {
           }}
         />
       )}
-    </main>
+    </div>
   );
 }

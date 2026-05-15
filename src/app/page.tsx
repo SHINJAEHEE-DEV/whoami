@@ -8,12 +8,15 @@ import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import { BookViewer } from '@/components/records/BookViewer';
 import { ListViewer } from '@/components/records/ListViewer';
+import { EditRecordModal } from '@/components/records/EditRecordModal';
 
 export default function Home() {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [viewMode, setViewMode] = useState<'book' | 'list'>('book');
+  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const router = useRouter();
 
   const fetchMyRecords = useCallback(async () => {
@@ -56,8 +59,8 @@ export default function Home() {
   }, [router, fetchMyRecords]);
 
   const handleEdit = (record: Record) => {
-    console.log('Edit record:', record);
-    // TODO: Implement edit functionality later
+    setSelectedRecord(record);
+    setIsEditModalOpen(true);
   };
 
   if (loading) {
@@ -123,6 +126,19 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {selectedRecord && (
+        <EditRecordModal
+          key={selectedRecord.id}
+          record={selectedRecord}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedRecord(null);
+          }}
+          onUpdate={fetchMyRecords}
+        />
+      )}
     </div>
   );
 }

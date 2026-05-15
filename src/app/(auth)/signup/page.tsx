@@ -22,8 +22,12 @@ export default function SignupPage() {
       await authService.signUp(email, password, username);
       alert('회원가입이 완료되었습니다. 이메일을 확인해 주세요.');
       router.push('/login');
-    } catch (err: any) {
-      setError(err.message || '회원가입 중 오류가 발생했습니다.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('회원가입 중 오류가 발생했습니다.');
+      }
     } finally {
       setLoading(false);
     }
