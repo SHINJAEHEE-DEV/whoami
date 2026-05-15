@@ -32,6 +32,24 @@ export const memberService = {
   },
 
   /**
+   * 특정 사용자의 프로필 정보를 가져옵니다.
+   */
+  async getProfileById(id: string): Promise<Profile | null> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile by id:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  /**
    * 프로필 정보를 업데이트합니다.
    */
   async updateProfile(id: string, updates: Partial<Profile>) {
@@ -123,5 +141,29 @@ export const memberService = {
       .maybeSingle();
       
     return theyFollow ? 'mutual' : 'following';
+  },
+
+  /**
+   * 나를 팔로우하는 사용자 목록을 가져옵니다.
+   */
+  async getMyFollowers(): Promise<Profile[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('로그인이 필요합니다.');
+
+    const { data, error } = await supabase
+      .from('follows')
+      .select(`
+        follower:follower_id (
+          id,
+          username,
+          avatar_url
+        )
+      `)
+      .eq('following_id', user.id)
+      .eq('status', 'accepted');
+
+    if (error) throw error;
+    // Map the nested object to a flat Profile array
+    return (data || []).map((d: any) => d.follower) as Profile[];
   }
 };
