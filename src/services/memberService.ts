@@ -50,15 +50,21 @@ export const memberService = {
   },
 
   /**
-   * 프로필 정보를 업데이트합니다.
+   * 현재 사용자의 프로필 정보를 업데이트합니다.
    */
-  async updateProfile(id: string, updates: Partial<Profile>) {
-    const { error } = await supabase
+  async updateProfile(updates: { username?: string; avatar_url?: string | null }) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('로그인이 필요합니다.');
+
+    const { data, error } = await supabase
       .from('profiles')
       .update(updates)
-      .eq('id', id);
+      .eq('id', user.id)
+      .select()
+      .single();
 
     if (error) throw error;
+    return data;
   },
 
   /**
@@ -163,7 +169,40 @@ export const memberService = {
       .eq('status', 'accepted');
 
     if (error) throw error;
+    
+    interface FollowRow {
+      follower: Profile;
+    }
+
     // Map the nested object to a flat Profile array
-    return (data || []).map((d: any) => d.follower) as Profile[];
+    return (data as unknown as FollowRow[] || []).map((d) => d.follower);
+  },
+
+  /**
+   * 내가 팔로우하는 사용자 목록을 가져옵니다.
+   */
+  async getMyFollowing(): Promise<Profile[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('로그인이 필요합니다.');
+
+    const { data, error } = await supabase
+      .from('follows')
+      .select(`
+        following:following_id (
+          id,
+          username,
+          avatar_url
+        )
+      `)
+      .eq('follower_id', user.id)
+      .eq('status', 'accepted');
+
+    if (error) throw error;
+    
+    interface FollowRow {
+      following: Profile;
+    }
+
+    return (data as unknown as FollowRow[] || []).map((d) => d.following);
   }
 };
