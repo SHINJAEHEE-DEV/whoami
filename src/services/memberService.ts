@@ -55,5 +55,73 @@ export const memberService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  /**
+   * 다른 사용자를 팔로우합니다.
+   */
+  async followUser(targetUserId: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('로그인이 필요합니다.');
+    
+    const { error } = await supabase
+      .from('follows')
+      .insert({ 
+        follower_id: user.id, 
+        following_id: targetUserId, 
+        status: 'accepted' 
+      });
+      
+    if (error) throw error;
+  },
+
+  /**
+   * 언팔로우합니다.
+   */
+  async unfollowUser(targetUserId: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('로그인이 필요합니다.');
+    
+    const { error } = await supabase
+      .from('follows')
+      .delete()
+      .match({ 
+        follower_id: user.id, 
+        following_id: targetUserId 
+      });
+      
+    if (error) throw error;
+  },
+
+  /**
+   * 두 사용자 간의 관계 상태를 확인합니다.
+   */
+  async checkRelationship(targetUserId: string): Promise<'none' | 'following' | 'mutual'> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return 'none';
+    
+    // 내가 상대방을 팔로우하고 있는지 확인
+    const { data: iFollow } = await supabase
+      .from('follows')
+      .select('status')
+      .match({ 
+        follower_id: user.id, 
+        following_id: targetUserId 
+      })
+      .maybeSingle();
+      
+    if (!iFollow) return 'none';
+    
+    // 상대방이 나를 팔로우하고 있는지 확인
+    const { data: theyFollow } = await supabase
+      .from('follows')
+      .select('status')
+      .match({ 
+        follower_id: targetUserId, 
+        following_id: user.id 
+      })
+      .maybeSingle();
+      
+    return theyFollow ? 'mutual' : 'following';
   }
 };
