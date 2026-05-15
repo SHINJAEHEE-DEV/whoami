@@ -73,7 +73,7 @@ export const recordService = {
   },
 
   /**
-   * 여러 개의 새로운 기록을 한꺼번에 작성합니다.
+   * 여러 개의 새로운 기록을 한꺼번에 생성합니다.
    */
   async createRecords(records: { 
     question: string; 
@@ -83,17 +83,44 @@ export const recordService = {
   }[]) {
     const user = await getCurrentUser();
 
+    // 데이터 유효성 검사
+    const validVisibilities = ['private', 'mutual', 'group', 'public'];
+
+    for (const record of records) {
+      if (!record.question || record.question.trim() === '') {
+        throw new Error('질문 내용이 비어있습니다.');
+      }
+      if (!record.answer || record.answer.trim() === '') {
+        throw new Error('답변 내용이 비어있는 항목이 있습니다.');
+      }
+      if (!validVisibilities.includes(record.visibility)) {
+        throw new Error(`잘못된 공개 설정입니다: ${record.visibility}`);
+      }
+    }
+
     const recordsWithUserId = records.map(r => ({
       ...r,
-      user_id: user.id
+      user_id: user.id,
+      answer: r.answer.trim(),
+      question: r.question.trim()
     }));
+
+    console.log('Inserting records:', recordsWithUserId);
 
     const { data, error } = await supabase
       .from('records')
       .insert(recordsWithUserId)
       .select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error inserting records:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      throw new Error(error.message || '기록 저장 중 오류가 발생했습니다.');
+    }
     return data;
   },
 
@@ -132,5 +159,23 @@ export const recordService = {
     }
 
     return (count || 0) > 0;
+  },
+
+  /**
+   * 기록을 수정합니다.
+   */
+  async updateRecord(id: string, updates: { answer?: string; visibility?: Record['visibility'] }) {
+    const { data, error } = await supabase
+      .from('records')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating record:', error);
+      throw error;
+    }
+    return data;
   }
 };
