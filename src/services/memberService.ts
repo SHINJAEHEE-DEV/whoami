@@ -204,5 +204,33 @@ export const memberService = {
     }
 
     return (data as unknown as FollowRow[] || []).map((d) => d.following);
+  },
+
+  /**
+   * 특정 사용자의 팔로워 수를 가져옵니다.
+   */
+  async getFollowerCount(userId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('following_id', userId)
+      .eq('status', 'accepted');
+      
+    if (error) throw error;
+    return count || 0;
+  },
+
+  /**
+   * 특정 사용자가 팔로우하는 사람의 수를 가져옵니다.
+   */
+  async getFollowingCount(userId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('follower_id', userId)
+      .eq('status', 'accepted');
+      
+    if (error) throw error;
+    return count || 0;
   }
 };
