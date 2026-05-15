@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,15 +36,18 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <Link href="/discover" className="text-gray-600 hover:text-gray-900">
+                <Link href="/discover" className="text-sm font-black text-brand-secondary hover:text-brand-primary transition-colors">
                   탐색
                 </Link>
-                <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+                <Link href="/groups" className="text-sm font-black text-brand-secondary hover:text-brand-primary transition-colors">
+                  그룹
+                </Link>
+                <Link href="/profile" className="text-sm font-black text-brand-secondary hover:text-brand-primary transition-colors">
                   프로필
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-sm font-black text-brand-secondary hover:text-brand-primary transition-colors"
                 >
                   로그아웃
                 </button>
