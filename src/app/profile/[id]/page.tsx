@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import { ListViewer } from '@/components/records/ListViewer';
+import { BookViewer } from '@/components/records/BookViewer';
 import { memberService, Profile } from '@/services/memberService';
 import { recordService, Record } from '@/services/recordService';
 import { supabase } from '@/lib/supabase';
@@ -21,6 +22,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [viewMode, setViewMode] = useState<'book' | 'list'>('book');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -166,6 +168,24 @@ export default function ProfilePage() {
             )}
           </header>
 
+          {/* View Toggle */}
+          <div className="flex justify-center -mb-2">
+            <div className="bg-white/50 backdrop-blur-sm p-1 rounded-full border border-brand-border flex shadow-mongle">
+              <button 
+                onClick={() => setViewMode('book')}
+                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'book' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
+              >
+                📖 책으로 보기
+              </button>
+              <button 
+                onClick={() => setViewMode('list')}
+                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'list' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
+              >
+                📜 목록으로 보기
+              </button>
+            </div>
+          </div>
+
           {/* Records List */}
           <section className="space-y-6">
             <h2 className="text-xl font-black text-brand-primary px-2 flex items-center space-x-2">
@@ -175,7 +195,11 @@ export default function ProfilePage() {
             </h2>
             
             {records.length > 0 ? (
-              <ListViewer records={records} />
+              viewMode === 'book' ? (
+                <BookViewer records={records} />
+              ) : (
+                <ListViewer records={records} />
+              )
             ) : (
               <div className="text-center py-16 bg-white rounded-[32px] border border-brand-border mx-2">
                 <p className="text-brand-secondary font-bold">표시할 수 있는 기록이 없습니다.</p>
