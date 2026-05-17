@@ -69,35 +69,34 @@ export default function DiscoverPage() {
                 {results.map((profile) => (
                   <div
                     key={profile.id}
-                    className="flex items-center justify-between p-8 bg-white rounded-[40px] border border-brand-border shadow-mongle hover-mongle"
+                    className="flex items-center justify-between p-5 bg-white rounded-3xl border border-brand-border shadow-mongle hover-mongle cursor-pointer"
+                    onClick={() => router.push(`/profile/${profile.id}`)}
                   >
-                    <div className="flex items-center space-x-6">
-                      <div className="w-16 h-124 bg-brand-warm rounded-full flex items-center justify-center border-2 border-brand-border overflow-hidden relative shadow-inner">
-                        <div className="w-16 h-16 flex items-center justify-center">
-                          {profile.avatar_url ? (
-                            <Image
-                              src={profile.avatar_url}
-                              alt={profile.username}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <span className="text-2xl font-black text-brand-secondary">
-                              {profile.username[0].toUpperCase()}
-                            </span>
-                          )}
-                        </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-brand-warm rounded-full flex items-center justify-center border-2 border-brand-border overflow-hidden relative shadow-inner">
+                        {profile.avatar_url ? (
+                          <Image
+                            src={profile.avatar_url}
+                            alt={profile.username}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-2xl font-black text-brand-secondary">
+                            {profile.username[0].toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div>
-                        <h3 className="text-xl font-black text-brand-primary tracking-tight">@{profile.username}</h3>
+                        <h3 className="text-lg font-black text-brand-primary">@{profile.username}</h3>
+                        <p className="text-xs font-bold text-brand-secondary">프로필 보기</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => router.push(`/profile/${profile.id}`)}
-                      className="px-8 py-3 bg-brand-warm text-brand-primary rounded-full font-black text-sm border-2 border-brand-border hover:bg-brand-border transition-all"
-                    >
-                      프로필 보기
-                    </button>
+                    <div className="text-brand-secondary pr-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
+                      </svg>
+                    </div>
                   </div>
                 ))}
               </div>
