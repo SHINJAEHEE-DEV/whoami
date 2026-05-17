@@ -84,8 +84,8 @@ export default function Home() {
       <main className="max-w-4xl mx-auto py-8 px-6">
         <div className="space-y-10">
           <header className="text-center space-y-2">
-            <h1 className="text-4xl font-black text-brand-primary tracking-tighter">우리의 이야기</h1>
-            <p className="text-base font-bold text-brand-secondary">나와 친구들의 진솔한 기록이 모이는 곳</p>
+            <h1 className="text-4xl font-black text-brand-primary tracking-tighter">나의 이야기</h1>
+            <p className="text-base font-bold text-brand-secondary">한 페이지씩 채워가는 나만의 디지털 자서전</p>
           </header>
 
           {/* View Toggle */}
