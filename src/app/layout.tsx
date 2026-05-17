@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -37,7 +38,10 @@ export default function RootLayout({
       lang="ko"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <ScrollToTop />
+      </body>
     </html>
   );
 }

@@ -7,6 +7,7 @@ export interface Record {
   answer: string;
   visibility: 'private' | 'mutual' | 'group' | 'public';
   question_type: string;
+  question_id?: string;
   created_at: string;
   profiles?: {
     username: string;
@@ -80,11 +81,15 @@ export const recordService = {
    * 여러 개의 새로운 기록을 한꺼번에 생성합니다.
    * visibility가 제공되지 않으면 기본적으로 'private'으로 저장됩니다.
    */
-  async createRecords(records: { 
-    question: string; 
-    answer: string; 
-    question_type: string;
-  }[], visibility: Record['visibility'] = 'private') {
+  async createRecords(
+    records: { 
+      question: string; 
+      answer: string; 
+      question_type: string;
+    }[], 
+    visibility: Record['visibility'] = 'private',
+    groupIds?: string[]
+  ) {
     const user = await getCurrentUser();
 
     for (const record of records) {
@@ -104,18 +109,32 @@ export const recordService = {
       question: r.question.trim()
     }));
 
-    console.log('Inserting records with visibility:', visibility, recordsWithUserId);
-
-    const { data, error } = await supabase
+    const { data: createdRecords, error: insertError } = await supabase
       .from('records')
       .insert(recordsWithUserId)
       .select();
 
-    if (error) {
-      console.error('Error inserting records:', error);
-      throw new Error(error.message || '기록 저장 중 오류가 발생했습니다.');
+    if (insertError) {
+      console.error('Error inserting records:', insertError);
+      throw new Error(insertError.message || '기록 저장 중 오류가 발생했습니다.');
     }
-    return data;
+
+    // Handle group access if visibility is 'group'
+    if (visibility === 'group' && groupIds && groupIds.length > 0 && createdRecords) {
+      const accessData = createdRecords.flatMap(record => 
+        groupIds.map(gid => ({
+          record_id: record.id,
+          group_id: gid
+        }))
+      );
+      const { error: groupError } = await supabase.from('record_group_access').insert(accessData);
+      if (groupError) {
+        console.error('Error setting group access:', groupError);
+        // We don't rollback records because they are already created, but we log the error
+      }
+    }
+
+    return createdRecords;
   },
 
     /**
@@ -184,10 +203,21 @@ export const recordService = {
   /**
    * 기록을 수정합니다.
    */
-  async updateRecord(id: string, updates: { question?: string; answer?: string; visibility?: Record['visibility'] }) {
+  async updateRecord(
+    id: string, 
+    updates: { 
+      question?: string; 
+      answer?: string; 
+      visibility?: Record['visibility'];
+      groupIds?: string[];
+    }
+  ) {
+    const { groupIds, ...rest } = updates;
+
+    // 1. Update record basics
     const { data, error } = await supabase
       .from('records')
-      .update(updates)
+      .update(rest)
       .eq('id', id)
       .select()
       .single();
@@ -196,6 +226,40 @@ export const recordService = {
       console.error('Error updating record:', error);
       throw error;
     }
+
+    // 2. Update group access if visibility is 'group' or if groupIds provided
+    if (updates.visibility === 'group' && groupIds) {
+      // Sync group access
+      await supabase.from('record_group_access').delete().eq('record_id', id);
+      if (groupIds.length > 0) {
+        const accessData = groupIds.map(gid => ({
+          record_id: id,
+          group_id: gid
+        }));
+        await supabase.from('record_group_access').insert(accessData);
+      }
+    } else if (updates.visibility && updates.visibility !== 'group') {
+      // Clear access if visibility changed from group to something else
+      await supabase.from('record_group_access').delete().eq('record_id', id);
+    }
+
     return data;
+  },
+
+  /**
+   * 특정 기록에 접근 가능한 그룹 ID 목록을 가져옵니다.
+   */
+  async getRecordGroupAccess(recordId: string): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('record_group_access')
+      .select('group_id')
+      .eq('record_id', recordId);
+
+    if (error) {
+      console.error('Error fetching record group access:', error);
+      throw error;
+    }
+
+    return data?.map(row => row.group_id) || [];
   }
 };

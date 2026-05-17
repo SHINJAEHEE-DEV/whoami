@@ -69,7 +69,7 @@ export default function NewRecordPage() {
     setShowVisibilitySheet(true);
   };
 
-  const handleVisibilityPublish = async (visibility: string) => {
+  const handleVisibilityPublish = async (visibility: string, groupIds?: string[]) => {
     if (!pendingAnswers || isSubmitting) return;
     
     setIsSubmitting(true);
@@ -82,7 +82,8 @@ export default function NewRecordPage() {
           answer: q.answer,
           question_type: q.type
         })),
-        visibility as Record['visibility']
+        visibility as Record['visibility'],
+        groupIds
       );
       
       // 성공 시 localStorage 비우기

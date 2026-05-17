@@ -62,9 +62,16 @@ describe('recordService', () => {
       const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
       const mockEq = vi.fn().mockReturnValue({ select: mockSelect });
       const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq });
+      const mockDelete = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) });
 
-      (supabase.from as Mock).mockReturnValue({
-        update: mockUpdate,
+      (supabase.from as Mock).mockImplementation((table) => {
+        if (table === 'records') {
+          return { update: mockUpdate };
+        }
+        if (table === 'record_group_access') {
+          return { delete: mockDelete };
+        }
+        return {};
       });
 
       const result = await recordService.updateRecord(recordId, updates);
