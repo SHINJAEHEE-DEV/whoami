@@ -21,7 +21,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // @ts-expect-error Turbopack type is not yet in NextConfig
   turbopack: {},
 };
 
