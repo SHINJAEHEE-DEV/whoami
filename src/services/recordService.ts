@@ -23,15 +23,12 @@ const getCurrentUser = async () => {
 export const recordService = {
   /**
    * 홈 피드에 표시할 기록들을 가져옵니다.
-   * RLS(Row Level Security)에 의해 다음 기록들만 필터링되어 반환됩니다:
-   * 1. 본인의 모든 기록
-   * 2. 타인의 'public' 기록
-   * 3. 서로 팔로우 중인 타인의 'mutual' 기록
-   * 4. 본인이 속한 그룹에 공유된 타인의 'group' 기록
+   * 현재 자신의 기록만 가져오도록 명시적으로 필터링합니다.
    */
   async getHomeFeed(): Promise<Record[]> {
-    // RLS 정책이 이미 강력하게 적용되어 있으므로, 
-    // 단순히 전체 기록을 조회해도 현재 사용자가 볼 권한이 있는 기록만 반환됩니다.
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from('records')
       .select(`
@@ -41,6 +38,7 @@ export const recordService = {
           avatar_url
         )
       `)
+      .eq('user_id', user.id) // 자신의 기록만 필터링하도록 eq 필터 추가
       .order('created_at', { ascending: false });
 
     if (error) {
