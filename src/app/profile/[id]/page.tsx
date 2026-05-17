@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import { ListViewer } from '@/components/records/ListViewer';
 import { BookViewer } from '@/components/records/BookViewer';
+import { EditRecordModal } from '@/components/records/EditRecordModal';
+import { ViewToggle } from '@/components/common/ViewToggle';
+import RelationshipTabs from '@/components/profile/RelationshipTabs';
 import { memberService, Profile } from '@/services/memberService';
 import { recordService, Record } from '@/services/recordService';
 import { supabase } from '@/lib/supabase';
@@ -18,44 +21,59 @@ export default function ProfilePage() {
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [records, setRecords] = useState<Record[]>([]);
+  const [followers, setFollowers] = useState<Profile[]>([]);
+  const [following, setFollowing] = useState<Profile[]>([]);
   const [relationship, setRelationship] = useState<'none' | 'following' | 'mutual'>('none');
   const [isLoading, setIsLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [viewMode, setViewMode] = useState<'book' | 'list'>('book');
+  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const fetchProfileData = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+
+      const targetProfile = await memberService.getProfileById(id);
+      if (!targetProfile) {
+        setIsLoading(false);
+        return;
+      }
+      setProfile(targetProfile);
+
+      const [userRecords, relStatus] = await Promise.all([
+        recordService.getUserRecords(id),
+        memberService.checkRelationship(id)
+      ]);
+
+      setRecords(userRecords);
+      setRelationship(relStatus);
+
+      // 본인 프로필인 경우에만 팔로워/팔로잉 목록 가져오기
+      if (user?.id === targetProfile.id) {
+        const [myFollowers, myFollowing] = await Promise.all([
+          memberService.getMyFollowers(),
+          memberService.getMyFollowing()
+        ]);
+        setFollowers(myFollowers);
+        setFollowing(myFollowing);
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!id) return;
-      
-      setIsLoading(true);
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setCurrentUser(user);
-
-        const targetProfile = await memberService.getProfileById(id);
-        if (!targetProfile) {
-          setIsLoading(false);
-          return;
-        }
-        setProfile(targetProfile);
-
-        const [userRecords, relStatus] = await Promise.all([
-          recordService.getUserRecords(id),
-          memberService.checkRelationship(id)
-        ]);
-
-        setRecords(userRecords);
-        setRelationship(relStatus);
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
+    (async () => {
+      await fetchProfileData();
+    })();
+  }, [fetchProfileData]);
 
   const handleFollowToggle = async () => {
     if (!profile || !currentUser) return;
@@ -80,6 +98,22 @@ export default function ProfilePage() {
     } finally {
       setIsActionLoading(false);
     }
+  };
+
+  const handleUnfollow = async (userId: string) => {
+    try {
+      await memberService.unfollowUser(userId);
+      // 목록 새로고침
+      const myFollowing = await memberService.getMyFollowing();
+      setFollowing(myFollowing);
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+    }
+  };
+
+  const handleEdit = (record: Record) => {
+    setSelectedRecord(record);
+    setIsEditModalOpen(true);
   };
 
   if (isLoading) {
@@ -169,22 +203,7 @@ export default function ProfilePage() {
           </header>
 
           {/* View Toggle */}
-          <div className="flex justify-center -mb-2">
-            <div className="bg-white/50 backdrop-blur-sm p-1 rounded-full border border-brand-border flex shadow-mongle">
-              <button 
-                onClick={() => setViewMode('book')}
-                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'book' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
-              >
-                📖 책으로 보기
-              </button>
-              <button 
-                onClick={() => setViewMode('list')}
-                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'list' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
-              >
-                📜 목록으로 보기
-              </button>
-            </div>
-          </div>
+          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           {/* Records List */}
           <section className="space-y-6">
@@ -196,9 +215,9 @@ export default function ProfilePage() {
             
             {records.length > 0 ? (
               viewMode === 'book' ? (
-                <BookViewer records={records} />
+                <BookViewer key={id} records={records} onEdit={isOwnProfile ? handleEdit : undefined} />
               ) : (
-                <ListViewer records={records} />
+                <ListViewer key={id} records={records} onEdit={isOwnProfile ? handleEdit : undefined} />
               )
             ) : (
               <div className="text-center py-16 bg-white rounded-[32px] border border-brand-border mx-2">
@@ -206,8 +225,38 @@ export default function ProfilePage() {
               </div>
             )}
           </section>
+
+          {/* My Connections - Only for own profile */}
+          {isOwnProfile && (
+            <section className="space-y-6">
+              <h2 className="text-xl font-black text-brand-primary px-2 flex items-center space-x-2">
+                <span>👥</span>
+                <span>나의 인맥</span>
+              </h2>
+              <div className="bg-white rounded-[32px] p-6 border border-brand-border shadow-mongle">
+                <RelationshipTabs 
+                  followers={followers} 
+                  following={following} 
+                  onUnfollow={handleUnfollow} 
+                />
+              </div>
+            </section>
+          )}
         </div>
       </main>
+
+      {selectedRecord && (
+        <EditRecordModal
+          key={selectedRecord.id}
+          record={selectedRecord}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedRecord(null);
+          }}
+          onUpdate={fetchProfileData}
+        />
+      )}
     </div>
   );
 }
