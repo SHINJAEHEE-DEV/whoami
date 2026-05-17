@@ -87,26 +87,29 @@ export const memberService = {
    */
   async isUsernameAvailable(username: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase
+      // 최적화: 데이터를 실제로 가져오지 않고(head: true), 
+      // 정확한 개수(count: 'exact')만 확인하여 존재 여부를 판단합니다.
+      const { count, error } = await supabase
         .from('profiles')
-        .select('username')
-        .eq('username', username)
-        .limit(1);
+        .select('*', { count: 'exact', head: true })
+        .eq('username', username);
 
       if (error) {
         console.error('Error checking username availability:', {
+          code: error.code,
           message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
+          details: error.details
         });
-        return false;
+        // 에러가 발생한 경우(예: 네트워크 문제, RLS 설정 오류 등) 
+        // 일단 사용 가능하다고 판단하여 가입 시도를 허용합니다. (실제 중복이면 DB 제약조건에서 걸림)
+        return true; 
       }
 
-      return data.length === 0;
+      // 존재하지 않으면(count === 0) 사용 가능한 아이디입니다.
+      return count === 0;
     } catch (e) {
       console.error('Unexpected error checking username availability:', e);
-      return false;
+      return true;
     }
   },
 

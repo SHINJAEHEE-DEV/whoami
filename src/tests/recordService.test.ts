@@ -28,8 +28,8 @@ describe('recordService', () => {
       (supabase.auth.getUser as Mock).mockResolvedValue({ data: { user: mockUser } });
 
       const mockRecords = [
-        { question: 'Q1', answer: 'A1', visibility: 'private' as const, question_type: 'type1' },
-        { question: 'Q2', answer: 'A2', visibility: 'public' as const, question_type: 'type2' },
+        { question: 'Q1', answer: 'A1', question_type: 'type1' },
+        { question: 'Q2', answer: 'A2', question_type: 'type2' },
       ];
 
       const mockInsert = vi.fn().mockReturnThis();
@@ -40,13 +40,13 @@ describe('recordService', () => {
         select: mockSelect,
       });
 
-      const result = await recordService.createRecords(mockRecords);
+      const result = await recordService.createRecords(mockRecords, 'private');
 
       expect(supabase.auth.getUser).toHaveBeenCalled();
       expect(supabase.from).toHaveBeenCalledWith('records');
       expect(mockInsert).toHaveBeenCalledWith([
-        { ...mockRecords[0], user_id: mockUser.id },
-        { ...mockRecords[1], user_id: mockUser.id },
+        { ...mockRecords[0], user_id: mockUser.id, visibility: 'private' },
+        { ...mockRecords[1], user_id: mockUser.id, visibility: 'private' },
       ]);
       expect(result).toEqual([{ id: '1' }, { id: '2' }]);
     });

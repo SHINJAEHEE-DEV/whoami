@@ -31,7 +31,7 @@ export default function LoginPage() {
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
-      setError(getKoreanError(err as any));
+      setError(getKoreanError(err instanceof Error ? err : { message: String(err) }));
     } finally {
       setLoading(false);
     }

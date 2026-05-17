@@ -9,6 +9,7 @@ import { User } from '@supabase/supabase-js';
 import { BookViewer } from '@/components/records/BookViewer';
 import { ListViewer } from '@/components/records/ListViewer';
 import { EditRecordModal } from '@/components/records/EditRecordModal';
+import { ViewToggle } from '@/components/common/ViewToggle';
 
 export default function Home() {
   const [records, setRecords] = useState<Record[]>([]);
@@ -88,22 +89,7 @@ export default function Home() {
           </header>
 
           {/* View Toggle */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-white/50 backdrop-blur-sm p-1 rounded-full border border-brand-border flex shadow-mongle">
-              <button 
-                onClick={() => setViewMode('book')}
-                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'book' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
-              >
-                📖 책으로 보기
-              </button>
-              <button 
-                onClick={() => setViewMode('list')}
-                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'list' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
-              >
-                📜 목록으로 보기
-              </button>
-            </div>
-          </div>
+          <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
 
           <div className="mt-6">
             {records.length > 0 ? (

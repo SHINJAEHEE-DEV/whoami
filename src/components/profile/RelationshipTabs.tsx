@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Profile } from '@/services/memberService';
 
 interface RelationshipTabsProps {
@@ -46,10 +47,11 @@ export default function RelationshipTabs({ followers, following, onUnfollow }: R
             <li key={user.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-brand-border hover:border-brand-primary transition-all">
               <Link href={`/profile/${user.id}`} className="flex items-center space-x-3 group">
                 <div className="w-10 h-10 rounded-full bg-brand-warm border border-brand-border overflow-hidden relative group-hover:ring-2 group-hover:ring-brand-primary transition-all">
-                  <img
+                  <Image
                     src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
                     alt={user.username}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <span className="font-bold text-brand-primary group-hover:text-brand-accent transition-colors">@{user.username}</span>

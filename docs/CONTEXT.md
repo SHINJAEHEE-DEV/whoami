@@ -1,19 +1,15 @@
-# Project: whoami (Digital Autobiography App)
+# Context
 
-## Goal
-- 개인의 내면을 기록하고, 단계별(Private/Group/Public)로 공유하는 서비스.
+## 현재 상황
+- 회원가입 시 `net::ERR_CONNECTION_REFUSED` 에러 발생 확인 및 해결 완료.
+- 원인: 윈도우 환경의 포트 예약(Hyper-V/WinNAT)으로 인해 Supabase 기본 포트(54321)가 차단됨.
+- 해결: Supabase 포트를 44321 범위로 변경하고 설정을 업데이트함.
 
-## Mission Constraints
-1. **Document-Driven**: 모든 판단 근거는 `GEMINI.md`와 `docs/` 내 문서에 기반함.
-2. **Design First**: 코드 작성 전 설계 문서 업데이트 및 승인 필수.
-3. **Security First**: Supabase RLS 를 통한 개인정보 보호 최우선.
-4. **Transparency**: 모든 결정과 작업은 `docs/AI-ACTION-LOGS.md` 및 `docs/AI-MAJOR-EVENT.md`에 기록.
+## 설정 정보
+- Supabase API: http://127.0.0.1:44321
+- Supabase DB: 44322
+- Supabase Studio: http://127.0.0.1:44323
+- Supabase Inbucket: http://127.0.0.1:44324
 
-## Current Phase: Phase 1 Initialization
-- 단계적 공유 도입: 개인 -> Group
-
-## Tech Stack
-- Next.js (App Router)
-- Tailwind CSS
-- ShadCN UI
-- Supabase (PostgreSQL, Auth, RLS)
+## 다음 작업
+- 변경된 포트 환경에서 회원가입 및 로그인 기능이 정상 작동하는지 사용자에게 확인 요청.

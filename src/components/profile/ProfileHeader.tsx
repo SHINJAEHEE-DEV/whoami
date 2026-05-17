@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Profile } from '@/services/memberService';
 
 interface ProfileHeaderProps {
@@ -22,10 +23,11 @@ export default function ProfileHeader({
   return (
     <header className="bg-white rounded-[40px] p-8 border border-brand-border shadow-sm flex flex-col items-center space-y-6">
       <div className="w-24 h-24 bg-brand-warm rounded-full flex items-center justify-center border-2 border-brand-border overflow-hidden relative">
-        <img
+        <Image
           src={avatarUrl}
           alt={profile.username}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       </div>
       

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Record } from '@/services/recordService';
 
-export const BookViewer = ({ records, onEdit }: { records: Record[], onEdit: (r: Record) => void }) => {
+export const BookViewer = ({ records, onEdit }: { records: Record[], onEdit?: (r: Record) => void }) => {
   const [page, setPage] = useState(0);
   const current = records[page];
 
@@ -22,12 +22,14 @@ export const BookViewer = ({ records, onEdit }: { records: Record[], onEdit: (r:
           <p className="text-lg sm:text-xl font-medium text-brand-primary leading-relaxed italic whitespace-pre-wrap">
             &quot;{current.answer}&quot;
           </p>
-          <button 
-            onClick={() => onEdit(current)}
-            className="absolute bottom-6 right-6 p-3 bg-brand-warm rounded-full hover:bg-gray-100 transition-colors"
-          >
-            ✏️
-          </button>
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(current)}
+              className="absolute bottom-6 right-6 p-3 bg-brand-warm rounded-full hover:bg-gray-100 transition-colors"
+            >
+              ✏️
+            </button>
+          )}
         </div>
       </div>
       
