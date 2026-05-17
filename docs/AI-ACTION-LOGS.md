@@ -1,4 +1,14 @@
 # AI ACTION LOGS
+- [2026-05-17] PWA (Progressive Web App) Implementation:
+    - Installed `@ducanh2912/next-pwa` for Next.js PWA support.
+    - Created `manifest.json` with service descriptions and color themes.
+    - Added `icon.svg` as a scalable vector icon.
+    - Configured `next.config.ts` and `layout.tsx` for PWA capabilities (standalone mode, theme color, etc.).
+- [2026-05-17] Documentation Sync & Onboarding Refinement:
+    - Synchronized `PROJECT_SUMMARY.md`, `TODO-READY.md`, and `TODO-DONE.md` with current implementation state.
+    - Updated `recordService.createRecords` to support custom visibility during batch insertion.
+    - Integrated `VisibilitySheet` into `/records/new` page to allow visibility selection after writing.
+    - Fixed all linting errors in `login`, `signup`, `auth callback`, and `EditProfileModal`.
 - [2026-05-15] Digital Autobiography Implementation - Task 1:
     - Added `updateRecord` method to `recordService.ts` for single record updates.
     - Added unit tests for `updateRecord` in `recordService.test.ts` (success and failure cases).

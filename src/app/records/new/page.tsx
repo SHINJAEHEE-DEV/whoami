@@ -6,19 +6,24 @@ import { WritingWizard, AnsweredQuestion } from '@/components/records/WritingWiz
 import { VisibilitySheet } from '@/components/records/VisibilitySheet';
 import { recordService, Record } from '@/services/recordService';
 import { questionService, Question } from '@/services/questionService';
+import { AlertModal } from '@/components/common/AlertModal';
 
 const STORAGE_KEY = 'whoami_onboarding_answers';
 
 export default function NewRecordPage() {
   const router = useRouter();
-  const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
-  const [answeredQuestions, setAnsweredQuestions] = useState<AnsweredQuestion[]>([]);
   const [initialAnswers, setInitialAnswers] = useState<string[] | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Visibility Sheet State
+  const [showVisibilitySheet, setShowVisibilitySheet] = useState(false);
+  const [pendingAnswers, setPendingAnswers] = useState<AnsweredQuestion[] | null>(null);
 
-  // 데이터 로드 및 초기화
+  const [modalConfig, setModalConfig] = useState<{isOpen: boolean, title?: string, message: string, type?: 'error' | 'success'}>({ isOpen: false, message: '' });
+
+  // ... (init useEffect unchanged)
   useEffect(() => {
     const init = async () => {
       try {
@@ -60,22 +65,24 @@ export default function NewRecordPage() {
   }, []);
 
   const handleWizardComplete = (answers: AnsweredQuestion[]) => {
-    setAnsweredQuestions(answers);
-    setIsVisibilityOpen(true);
+    setPendingAnswers(answers);
+    setShowVisibilitySheet(true);
   };
 
-  const handlePublish = async (visibility: string) => {
-    if (answeredQuestions.length === 0 || isSubmitting) return;
+  const handleVisibilityPublish = async (visibility: string) => {
+    if (!pendingAnswers || isSubmitting) return;
     
     setIsSubmitting(true);
+    setShowVisibilitySheet(false);
+    
     try {
       await recordService.createRecords(
-        answeredQuestions.map(q => ({
+        pendingAnswers.map(q => ({
           question: q.question,
           answer: q.answer,
-          visibility: visibility as Record['visibility'],
           question_type: q.type
-        }))
+        })),
+        visibility as Record['visibility']
       );
       
       // 성공 시 localStorage 비우기
@@ -86,8 +93,13 @@ export default function NewRecordPage() {
       router.refresh();
     } catch (error) {
       const err = error as Error;
-      console.error('Failed to publish records:', err);
-      alert(err.message || '저장에 실패했습니다. 다시 시도해주세요.');
+      console.error('Failed to save records:', err);
+      setModalConfig({
+        isOpen: true,
+        title: '저장 실패',
+        message: err.message || '저장에 실패했습니다. 다시 시도해주세요.',
+        type: 'error'
+      });
       setIsSubmitting(false);
     }
   };
@@ -108,15 +120,15 @@ export default function NewRecordPage() {
         initialAnswers={initialAnswers || undefined}
         onProgressUpdate={handleProgressUpdate}
       />
-      
-      {answeredQuestions.length > 0 && (
-        <VisibilitySheet
-          isOpen={isVisibilityOpen}
-          onClose={() => !isSubmitting && setIsVisibilityOpen(false)}
-          onPublish={handlePublish}
-          summary={{ count: answeredQuestions.length }}
-        />
-      )}
+
+      <VisibilitySheet 
+        isOpen={showVisibilitySheet}
+        onClose={() => setShowVisibilitySheet(false)}
+        onPublish={handleVisibilityPublish}
+        summary={{
+          count: pendingAnswers?.length || 0
+        }}
+      />
 
       {isSubmitting && (
         <div className="fixed inset-0 z-[100] bg-black/20 flex items-center justify-center backdrop-blur-[2px]">
@@ -126,6 +138,15 @@ export default function NewRecordPage() {
           </div>
         </div>
       )}
+
+      <AlertModal 
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+      />
     </div>
   );
 }
+

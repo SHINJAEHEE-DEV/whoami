@@ -33,66 +33,68 @@ export default function DiscoverPage() {
     <div className="min-h-screen bg-brand-warm pb-20">
       <Navbar />
       
-      <main className="max-w-4xl mx-auto py-12 px-4">
-        <div className="space-y-12">
+      <main className="max-w-4xl mx-auto py-16 px-6">
+        <div className="space-y-16">
           <header className="text-center space-y-4">
-            <h1 className="text-4xl font-black text-brand-primary tracking-tight">친구 찾기</h1>
-            <p className="text-brand-secondary font-bold">다른 사람들의 자서전을 찾아보세요.</p>
+            <h1 className="text-5xl font-black text-brand-primary tracking-tighter">친구 찾기</h1>
+            <p className="text-lg font-bold text-brand-secondary">다른 사람들의 자서전을 찾아보세요.</p>
           </header>
 
           <section className="max-w-md mx-auto">
-            <form onSubmit={handleSearch} className="relative">
+            <form onSubmit={handleSearch} className="relative group">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="사용자 아이디 검색"
-                className="w-full px-6 py-4 bg-white rounded-2xl border border-brand-border focus:outline-none focus:ring-2 focus:ring-brand-accent/50 text-brand-primary font-medium"
+                className="w-full px-8 py-5 bg-white rounded-full border-2 border-brand-border focus:border-brand-primary outline-none text-brand-primary font-bold shadow-mongle transition-all placeholder:text-brand-secondary/40"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="absolute right-2 top-2 px-6 py-2 bg-brand-primary text-white rounded-xl font-bold hover:scale-105 transition-transform disabled:opacity-50"
+                className="absolute right-2 top-2 px-8 py-3 bg-brand-primary text-white rounded-full font-black text-sm hover-mongle disabled:opacity-50 shadow-lg"
               >
                 {isLoading ? '검색 중...' : '검색'}
               </button>
             </form>
           </section>
 
-          <section className="space-y-4">
+          <section className="space-y-6">
             {isLoading ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+              <div className="flex justify-center py-20">
+                <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : results.length > 0 ? (
-              <div className="grid gap-4">
+              <div className="grid gap-6">
                 {results.map((profile) => (
                   <div
                     key={profile.id}
-                    className="flex items-center justify-between p-6 bg-white rounded-3xl border border-brand-border hover:shadow-sm transition-shadow"
+                    className="flex items-center justify-between p-8 bg-white rounded-[40px] border border-brand-border shadow-mongle hover-mongle"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-brand-warm rounded-full flex items-center justify-center border border-brand-border overflow-hidden relative">
-                        {profile.avatar_url ? (
-                          <Image
-                            src={profile.avatar_url}
-                            alt={profile.username}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="text-xl font-black text-brand-secondary">
-                            {profile.username[0].toUpperCase()}
-                          </span>
-                        )}
+                    <div className="flex items-center space-x-6">
+                      <div className="w-16 h-124 bg-brand-warm rounded-full flex items-center justify-center border-2 border-brand-border overflow-hidden relative shadow-inner">
+                        <div className="w-16 h-16 flex items-center justify-center">
+                          {profile.avatar_url ? (
+                            <Image
+                              src={profile.avatar_url}
+                              alt={profile.username}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="text-2xl font-black text-brand-secondary">
+                              {profile.username[0].toUpperCase()}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div>
-                        <h3 className="text-lg font-black text-brand-primary">@{profile.username}</h3>
+                        <h3 className="text-xl font-black text-brand-primary tracking-tight">@{profile.username}</h3>
                       </div>
                     </div>
                     <button
                       onClick={() => router.push(`/profile/${profile.id}`)}
-                      className="px-6 py-2 bg-brand-warm text-brand-primary rounded-xl font-bold border border-brand-border hover:bg-brand-border transition-colors"
+                      className="px-8 py-3 bg-brand-warm text-brand-primary rounded-full font-black text-sm border-2 border-brand-border hover:bg-brand-border transition-all"
                     >
                       프로필 보기
                     </button>
@@ -100,8 +102,8 @@ export default function DiscoverPage() {
                 ))}
               </div>
             ) : hasSearched ? (
-              <div className="text-center py-20 bg-white rounded-3xl border border-brand-border">
-                <p className="text-brand-secondary font-bold">검색 결과가 없습니다.</p>
+              <div className="text-center py-24 bg-white/50 backdrop-blur-sm rounded-[48px] border border-dashed border-brand-border shadow-inner">
+                <p className="text-brand-secondary font-black text-lg">검색 결과가 없습니다. 🥺</p>
               </div>
             ) : null}
           </section>

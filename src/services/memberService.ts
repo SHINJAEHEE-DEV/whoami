@@ -82,6 +82,35 @@ export const memberService = {
   },
 
   /**
+   * 닉네임 중복 여부를 확인합니다.
+   * 사용 가능한 경우 true, 이미 존재하는 경우 false를 반환합니다.
+   */
+  async isUsernameAvailable(username: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('username', username)
+        .limit(1);
+
+      if (error) {
+        console.error('Error checking username availability:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        return false;
+      }
+
+      return data.length === 0;
+    } catch (e) {
+      console.error('Unexpected error checking username availability:', e);
+      return false;
+    }
+  },
+
+  /**
    * 다른 사용자를 팔로우합니다.
    */
   async followUser(targetUserId: string) {

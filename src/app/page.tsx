@@ -19,15 +19,18 @@ export default function Home() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const router = useRouter();
 
-  const fetchMyRecords = useCallback(async () => {
+  const fetchHomeFeed = useCallback(async () => {
     try {
-      const data = await recordService.getMyRecords();
+      const data = await recordService.getHomeFeed();
       setRecords(data);
-      if (data.length === 0) {
+      
+      // 내 기록이 하나도 없는지 별도로 체크 (온보딩 리다이렉트용)
+      const hasMyRecords = await recordService.hasRecords();
+      if (!hasMyRecords) {
         router.push('/records/new');
       }
     } catch (error) {
-      console.error('Failed to fetch records:', error);
+      console.error('Failed to fetch home feed:', error);
     }
   }, [router]);
 
@@ -39,7 +42,7 @@ export default function Home() {
       if (!session) {
         router.push('/login');
       } else {
-        await fetchMyRecords();
+        await fetchHomeFeed();
       }
       setLoading(false);
     };
@@ -49,14 +52,14 @@ export default function Home() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session) {
-        fetchMyRecords();
+        fetchHomeFeed();
       } else {
         router.push('/login');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [router, fetchMyRecords]);
+  }, [router, fetchHomeFeed]);
 
   const handleEdit = (record: Record) => {
     setSelectedRecord(record);
@@ -74,35 +77,35 @@ export default function Home() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-brand-warm pb-20">
+    <div className="min-h-screen bg-brand-warm pb-10">
       <Navbar />
       
-      <main className="max-w-4xl mx-auto py-12 px-4">
-        <div className="space-y-12">
-          <header className="text-center space-y-4">
-            <h1 className="text-4xl font-black text-brand-primary tracking-tight">나의 자서전</h1>
-            <p className="text-brand-secondary font-bold">지금까지 기록된 나의 이야기들입니다.</p>
+      <main className="max-w-4xl mx-auto py-8 px-6">
+        <div className="space-y-10">
+          <header className="text-center space-y-2">
+            <h1 className="text-4xl font-black text-brand-primary tracking-tighter">우리의 이야기</h1>
+            <p className="text-base font-bold text-brand-secondary">나와 친구들의 진솔한 기록이 모이는 곳</p>
           </header>
 
           {/* View Toggle */}
           <div className="flex justify-center mb-8">
-            <div className="bg-white p-1 rounded-2xl border border-brand-border flex shadow-sm">
+            <div className="bg-white/50 backdrop-blur-sm p-1 rounded-full border border-brand-border flex shadow-mongle">
               <button 
                 onClick={() => setViewMode('book')}
-                className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${viewMode === 'book' ? 'bg-brand-primary text-white' : 'text-brand-secondary'}`}
+                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'book' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
               >
                 📖 책으로 보기
               </button>
               <button 
                 onClick={() => setViewMode('list')}
-                className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${viewMode === 'list' ? 'bg-brand-primary text-white' : 'text-brand-secondary'}`}
+                className={`px-6 py-2 rounded-full text-[12px] font-black transition-all ${viewMode === 'list' ? 'bg-brand-primary text-white shadow-md' : 'text-brand-secondary hover:text-brand-primary'}`}
               >
                 📜 목록으로 보기
               </button>
             </div>
           </div>
 
-          <div className="mt-8">
+          <div className="mt-6">
             {records.length > 0 ? (
               viewMode === 'book' ? (
                 <BookViewer records={records} onEdit={handleEdit} />
@@ -110,18 +113,18 @@ export default function Home() {
                 <ListViewer records={records} onEdit={handleEdit} />
               )
             ) : (
-              <div className="text-center py-20 bg-white rounded-3xl border border-brand-border">
+              <div className="text-center py-12 bg-white rounded-3xl border border-brand-border">
                 <p className="text-brand-secondary font-bold">표시할 기록이 없습니다.</p>
               </div>
             )}
           </div>
           
-          <div className="flex justify-center mt-12">
+          <div className="flex justify-center mt-10">
             <button 
               onClick={() => router.push('/records/new')}
-              className="px-8 py-4 bg-brand-primary text-white rounded-2xl font-black shadow-lg hover:scale-105 transition-transform"
+              className="px-8 py-4 bg-brand-primary text-white rounded-full font-black text-base shadow-lg hover-mongle"
             >
-              새로운 기록 남기기
+              ✨ 새로운 기록 남기기
             </button>
           </div>
         </div>
@@ -136,7 +139,7 @@ export default function Home() {
             setIsEditModalOpen(false);
             setSelectedRecord(null);
           }}
-          onUpdate={fetchMyRecords}
+          onUpdate={fetchHomeFeed}
         />
       )}
     </div>

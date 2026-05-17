@@ -1,0 +1,23 @@
+{
+  "name": "whoami: 디지털 자서전",
+  "short_name": "whoami",
+  "description": "진솔한 나를 기록하고 소중한 지인과 나누는 디지털 자서전",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FCFBF8",
+  "theme_color": "#1C1C1C",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

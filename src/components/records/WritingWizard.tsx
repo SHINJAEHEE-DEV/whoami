@@ -94,28 +94,30 @@ export const WritingWizard: React.FC<WritingWizardProps> = ({
   return (
     <div className="flex flex-col h-svh max-w-md mx-auto bg-brand-warm relative">
       {/* Progress Bar */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-[#F0EBE1] z-50">
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-brand-border z-50">
         <div 
-          className="bg-brand-accent h-full transition-all duration-300" 
+          className="bg-brand-accent h-full transition-all duration-700 ease-out rounded-r-full shadow-[0_0_10px_rgba(255,179,71,0.5)]" 
           style={{ width: `${progress}%` }} 
         />
       </div>
 
       {/* Header */}
       <header className="px-6 pt-6 pb-2 flex justify-between items-center">
-        <h1 className="text-lg font-black tracking-tight">whoami</h1>
+        <h1 className="text-xl font-black tracking-tighter text-brand-primary">whoami</h1>
         <div className="flex flex-col items-end">
-          <span className="text-[10px] font-black text-brand-accent uppercase tracking-widest mb-0.5">Stage {currentQuestion.stage}</span>
-          <span className="text-xs font-bold text-brand-secondary">
-            {currentIndex + 1} / {questions.length}
+          <div className="px-2 py-0.5 bg-white rounded-full border border-brand-border shadow-sm mb-0.5">
+            <span className="text-[9px] font-black text-brand-secondary tracking-widest uppercase">Stage {currentQuestion.stage}</span>
+          </div>
+          <span className="text-[10px] font-black text-brand-secondary/60">
+            {currentIndex + 1} <span className="mx-0.5">/</span> {questions.length}
           </span>
         </div>
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-6 pt-4 pb-12 overflow-y-auto">
-        <div className="mb-6">
-          <span className="inline-block px-3 py-1 text-[10px] font-black bg-[#FFF5E6] text-[#E68A00] rounded-full uppercase tracking-wider">
+      <main className="flex-1 px-6 pt-4 pb-6 overflow-y-auto custom-scrollbar">
+        <div className="mb-4">
+          <span className="inline-block px-3 py-1 text-[9px] font-black bg-white text-brand-accent rounded-full border-2 border-brand-accent/20 shadow-sm uppercase tracking-wider">
             {currentQuestion.stage === 1 ? '🍩 취향' : 
              currentQuestion.stage === 2 ? '🏠 일상' : 
              currentQuestion.stage === 3 ? '🌿 뿌리' : 
@@ -123,7 +125,7 @@ export const WritingWizard: React.FC<WritingWizardProps> = ({
           </span>
         </div>
 
-        <h2 className="text-2xl font-black leading-tight mb-8 tracking-tight text-brand-primary">
+        <h2 className="text-2xl font-black leading-tight mb-6 tracking-tight text-brand-primary">
           {currentQuestion.question_text}
         </h2>
 
@@ -134,13 +136,13 @@ export const WritingWizard: React.FC<WritingWizardProps> = ({
                 <button
                   key={opt}
                   onClick={() => updateAnswer(opt)}
-                  className={`w-full p-5 rounded-[20px] border-2 text-left transition-all duration-200 ${
+                  className={`w-full p-4 rounded-[24px] border-2 text-left transition-all duration-300 hover-mongle ${
                     currentAnswer === opt 
-                      ? 'border-brand-primary bg-white shadow-md' 
-                      : 'border-brand-border bg-white/50 hover:bg-white'
+                      ? 'border-brand-primary bg-white shadow-lg translate-y-[-1px]' 
+                      : 'border-brand-border bg-white/40 hover:bg-white'
                   }`}
                 >
-                  <span className="text-lg font-bold">{opt}</span>
+                  <span className="text-base font-black text-brand-primary">{opt}</span>
                 </button>
               ))}
             </div>
@@ -148,7 +150,7 @@ export const WritingWizard: React.FC<WritingWizardProps> = ({
             <textarea 
               value={currentAnswer}
               onChange={(e) => updateAnswer(e.target.value)}
-              className="w-full h-[40vh] bg-transparent border-none focus:ring-0 p-0 text-xl font-medium leading-relaxed placeholder:text-gray-300 outline-none resize-none text-brand-primary"
+              className="w-full h-[35vh] bg-white/10 border-none focus:ring-0 p-0 text-xl font-bold leading-relaxed placeholder:text-brand-secondary/30 outline-none resize-none text-brand-primary"
               placeholder="편하게 당신의 마음을 적어주세요..."
             />
           )}
@@ -156,12 +158,12 @@ export const WritingWizard: React.FC<WritingWizardProps> = ({
       </main>
 
       {/* Sticky Footer */}
-      <footer className="p-6 pb-8 bg-brand-warm border-t border-brand-border flex gap-3">
+      <footer className="p-6 pb-8 bg-brand-warm/80 backdrop-blur-sm border-t border-brand-border flex gap-3">
         <button 
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all ${
-            currentIndex === 0 ? 'bg-gray-100 text-gray-300' : 'bg-brand-border text-gray-600 hover:bg-gray-200'
+          className={`flex-1 py-4 rounded-[20px] font-black text-sm transition-all ${
+            currentIndex === 0 ? 'bg-transparent text-transparent pointer-events-none' : 'bg-white border-2 border-brand-border text-brand-secondary hover:bg-brand-border'
           }`}
         >
           이전
@@ -176,13 +178,13 @@ export const WritingWizard: React.FC<WritingWizardProps> = ({
             onComplete(formattedAnswers);
           } : handleNext}
           disabled={currentIndex === questions.length - 1 ? !isAllAnswered : !isCurrentAnswered}
-          className={`flex-[2] py-4 rounded-2xl font-bold text-sm shadow-lg transition-all ${
+          className={`flex-[2.5] py-4 rounded-full font-black text-sm shadow-lg transition-all hover-mongle ${
             (currentIndex === questions.length - 1 ? isAllAnswered : isCurrentAnswered)
-              ? 'bg-brand-primary text-white active:scale-95' 
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              ? 'bg-brand-primary text-white' 
+              : 'bg-brand-border text-brand-secondary/40 cursor-not-allowed'
           }`}
         >
-          {currentIndex === questions.length - 1 ? '작성 완료' : '다음'}
+          {currentIndex === questions.length - 1 ? '✨ 작성 완료' : '다음 이야기'}
         </button>
       </footer>
 

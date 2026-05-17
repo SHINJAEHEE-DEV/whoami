@@ -1,25 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-warm: #FCFBF8;
+  /* 더 부드럽고 따뜻한 색감으로 조정 */
+  --color-brand-warm: #FAF7F2;
   --color-brand-accent: #FFB347;
-  --color-brand-primary: #1C1C1C;
-  --color-brand-secondary: #9E9E9E;
+  --color-brand-primary: #3D352E;    /* 완전한 검정 대신 짙은 갈색 톤으로 부드럽게 */
+  --color-brand-secondary: #8C8279;  /* 회색 대신 웜그레이 톤 */
   --color-brand-card: #FFFFFF;
-  --color-brand-border: #F5F3EF;
+  --color-brand-border: #F0EBE1;
+  
+  /* 몽글몽글한 곡률 정의 */
+  --radius-mongle: 40px;
+  --radius-mongle-sm: 24px;
 }
 
-html,
-body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+@layer base {
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--color-brand-warm);
+    color: var(--color-brand-primary);
+    font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.02em;
+  }
 }
 
-body {
-  background-color: var(--color-brand-warm);
-  color: var(--color-brand-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+@layer utilities {
+  /* 몽글몽글한 그림자 효과 */
+  .shadow-mongle {
+    box-shadow: 0 10px 30px -5px rgba(61, 53, 46, 0.05), 0 4px 12px -2px rgba(61, 53, 46, 0.03);
+  }
+  
+  /* 부드러운 상호작용 */
+  .hover-mongle {
+    @apply transition-all duration-300 hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-brand-border);
+    border-radius: 10px;
+  }
 }

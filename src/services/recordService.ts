@@ -23,9 +23,15 @@ const getCurrentUser = async () => {
 export const recordService = {
   /**
    * 홈 피드에 표시할 기록들을 가져옵니다.
-   * RLS에 의해 사용자가 볼 수 있는 기록만 필터링되어 반환됩니다.
+   * RLS(Row Level Security)에 의해 다음 기록들만 필터링되어 반환됩니다:
+   * 1. 본인의 모든 기록
+   * 2. 타인의 'public' 기록
+   * 3. 서로 팔로우 중인 타인의 'mutual' 기록
+   * 4. 본인이 속한 그룹에 공유된 타인의 'group' 기록
    */
   async getHomeFeed(): Promise<Record[]> {
+    // RLS 정책이 이미 강력하게 적용되어 있으므로, 
+    // 단순히 전체 기록을 조회해도 현재 사용자가 볼 권한이 있는 기록만 반환됩니다.
     const { data, error } = await supabase
       .from('records')
       .select(`
@@ -47,11 +53,11 @@ export const recordService = {
 
   /**
    * 새로운 기록을 작성합니다.
+   * 작성 시에는 항상 'private'으로 저장되며, 이후에 공개 범위를 수정할 수 있습니다.
    */
   async createRecord(
     question: string, 
     answer: string, 
-    visibility: Record['visibility'] = 'private',
     question_type: string = 'free-text'
   ) {
     const user = await getCurrentUser();
@@ -62,7 +68,7 @@ export const recordService = {
         user_id: user.id,
         question,
         answer,
-        visibility,
+        visibility: 'private',
         question_type,
       })
       .select()
@@ -74,17 +80,14 @@ export const recordService = {
 
   /**
    * 여러 개의 새로운 기록을 한꺼번에 생성합니다.
+   * visibility가 제공되지 않으면 기본적으로 'private'으로 저장됩니다.
    */
   async createRecords(records: { 
     question: string; 
     answer: string; 
-    visibility: Record['visibility'];
     question_type: string;
-  }[]) {
+  }[], visibility: Record['visibility'] = 'private') {
     const user = await getCurrentUser();
-
-    // 데이터 유효성 검사
-    const validVisibilities = ['private', 'mutual', 'group', 'public'];
 
     for (const record of records) {
       if (!record.question || record.question.trim() === '') {
@@ -93,19 +96,17 @@ export const recordService = {
       if (!record.answer || record.answer.trim() === '') {
         throw new Error('답변 내용이 비어있는 항목이 있습니다.');
       }
-      if (!validVisibilities.includes(record.visibility)) {
-        throw new Error(`잘못된 공개 설정입니다: ${record.visibility}`);
-      }
     }
 
     const recordsWithUserId = records.map(r => ({
       ...r,
       user_id: user.id,
+      visibility,
       answer: r.answer.trim(),
       question: r.question.trim()
     }));
 
-    console.log('Inserting records:', recordsWithUserId);
+    console.log('Inserting records with visibility:', visibility, recordsWithUserId);
 
     const { data, error } = await supabase
       .from('records')
@@ -113,16 +114,11 @@ export const recordService = {
       .select();
 
     if (error) {
-      console.error('Error inserting records:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
+      console.error('Error inserting records:', error);
       throw new Error(error.message || '기록 저장 중 오류가 발생했습니다.');
     }
     return data;
-    },
+  },
 
     /**
     * 특정 사용자의 기록들을 가져옵니다.

@@ -115,32 +115,39 @@ export default function ProfilePage() {
       <Navbar />
       
       <main className="max-w-4xl mx-auto py-12 px-4">
-        <div className="space-y-12">
+        <div className="space-y-10">
           {/* Profile Header */}
-          <header className="bg-white rounded-[40px] p-8 border border-brand-border shadow-sm flex flex-col items-center space-y-6">
-            <div className="w-24 h-24 bg-brand-warm rounded-full flex items-center justify-center border-2 border-brand-border overflow-hidden relative">
-              {profile.avatar_url ? (
-                <Image
-                  src={profile.avatar_url}
-                  alt={profile.username}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <span className="text-4xl font-black text-brand-secondary">
-                  {profile.username[0].toUpperCase()}
-                </span>
-              )}
+          <header className="bg-white rounded-[48px] p-8 border border-brand-border shadow-mongle flex flex-col items-center space-y-6">
+            <div className="w-24 h-28 bg-brand-warm rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden relative">
+              <div className="w-24 h-24 flex items-center justify-center">
+                {profile.avatar_url ? (
+                  <Image
+                    src={profile.avatar_url}
+                    alt={profile.username}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="text-4xl font-black text-brand-secondary">
+                    {profile.username[0].toUpperCase()}
+                  </span>
+                )}
+              </div>
             </div>
             
             <div className="text-center space-y-2">
-              <h1 className="text-3xl font-black text-brand-primary">@{profile.username}</h1>
+              <h1 className="text-3xl font-black text-brand-primary tracking-tighter">@{profile.username}</h1>
               <div className="flex items-center justify-center space-x-2">
-                {relationship !== 'none' && (
-                  <span className="px-3 py-1 bg-brand-accent/10 text-brand-accent text-xs font-bold rounded-full">
-                    {relationship === 'mutual' ? '서로 팔로우 중' : '팔로잉'}
-                  </span>
-                )}
+                {relationship === 'mutual' ? (
+                  <div className="flex items-center space-x-1.5 px-3.5 py-1 bg-brand-accent/10 border-2 border-brand-accent/20 rounded-full">
+                    <span className="text-sm">✨</span>
+                    <span className="text-[11px] font-black text-brand-accent tracking-tight">서로 팔로우 중</span>
+                  </div>
+                ) : relationship === 'following' ? (
+                  <div className="px-3.5 py-1 bg-brand-warm border-2 border-brand-border rounded-full">
+                    <span className="text-[11px] font-black text-brand-secondary tracking-tight">내가 팔로우 중</span>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -148,33 +155,30 @@ export default function ProfilePage() {
               <button
                 onClick={handleFollowToggle}
                 disabled={isActionLoading}
-                className={`px-12 py-3 rounded-2xl font-black transition-all transform active:scale-95 disabled:opacity-50 ${
+                className={`px-10 py-3 rounded-full font-black text-base shadow-lg hover-mongle transition-all disabled:opacity-50 ${
                   relationship === 'none'
-                    ? 'bg-brand-primary text-white hover:bg-opacity-90'
-                    : 'bg-brand-warm text-brand-primary border border-brand-border hover:bg-brand-border'
+                    ? 'bg-brand-primary text-white'
+                    : 'bg-white text-brand-primary border-2 border-brand-border hover:bg-brand-warm'
                 }`}
               >
-                {isActionLoading ? '처리 중...' : relationship === 'none' ? '팔로우' : '팔로잉'}
+                {isActionLoading ? '잠시만요...' : relationship === 'none' ? '팔로우하기' : '팔로잉'}
               </button>
             )}
           </header>
 
           {/* Records List */}
-          <section className="space-y-8">
-            <h2 className="text-2xl font-black text-brand-primary px-4 flex items-center space-x-2">
+          <section className="space-y-6">
+            <h2 className="text-xl font-black text-brand-primary px-2 flex items-center space-x-2">
               <span>📖</span>
               <span>자서전 기록</span>
-              <span className="text-sm font-bold text-brand-secondary ml-2">({records.length})</span>
+              <span className="text-xs font-bold text-brand-secondary ml-1">({records.length})</span>
             </h2>
             
             {records.length > 0 ? (
               <ListViewer records={records} />
             ) : (
-              <div className="text-center py-20 bg-white rounded-[40px] border border-brand-border mx-4">
+              <div className="text-center py-16 bg-white rounded-[32px] border border-brand-border mx-2">
                 <p className="text-brand-secondary font-bold">표시할 수 있는 기록이 없습니다.</p>
-                {relationship === 'none' && !isOwnProfile && (
-                  <p className="text-sm text-brand-secondary mt-2">팔로우하면 더 많은 기록을 볼 수 있을지도 몰라요!</p>
-                )}
               </div>
             )}
           </section>
