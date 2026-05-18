@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📖 whoami : 나의 디지털 자서전
 
-## Getting Started
+> **"당신은 어떤 사람인가요?"**  
+> 진솔한 나를 기록하고, 소중한 사람들과 나누는 특별한 공간
 
-First, run the development server:
+`whoami`는 70개의 정교하게 설계된 질문을 통해 나만의 인생 이야기를 채워나가는 **디지털 자서전 서비스**입니다. 단순한 기록을 넘어, 내가 선택한 사람들과 소중한 기억을 공유하며 더 깊은 유대감을 형성할 수 있습니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## ✨ 주요 기능
+
+### 1. 5단계 자서전 로드맵 (70개 질문)
+인생의 다양한 측면을 아우르는 70개의 질문이 5가지 단계로 제공됩니다.
+- **Stage 1. 취향 탐색**: 가벼운 아이스브레이킹과 나의 기호 확인
+- **Stage 2. 일상과 휴식**: 현재의 삶을 구성하는 소소한 순간들
+- **Stage 3. 나의 뿌리**: 어린 시절의 기억과 나를 만든 과거의 조각들
+- **Stage 4. 가치관과 관계**: 내면의 단단한 신념과 소중한 인연들
+- **Stage 5. 미래와 고백**: 앞으로 꿈꾸는 모습과 진솔한 속마음
+
+### 2. 몰입감 있는 뷰어 경험
+- **📖 책으로 보기**: 실제 책을 넘기는 듯한 인터랙티브한 경험으로 기록을 감상합니다.
+- **📜 목록으로 보기**: 전체 기록을 세로로 스크롤하며 빠르고 편하게 읽어봅니다.
+
+### 3. 세밀한 공개 범위 설정 (Visibility)
+각 기록마다 노출 대상을 직접 지정하여 프라이버시를 완벽하게 보호합니다.
+- **나만 보기**: 나만의 비밀 일기장으로 활용
+- **팔로워 전체 공개**: 나를 팔로우하는 모든 친구들에게 공유
+- **[그룹] 공개**: 고등학교 친구들, 가족, 회사 동료 등 내가 만든 특정 그룹원에게만 노출
+- **전체 공개**: 서비스의 모든 사용자에게 나의 이야기를 전시
+
+### 4. 관계 및 그룹 관리
+- **탐색(Discover)**: 유저네임으로 다른 사람을 찾고 팔로우할 수 있습니다.
+- **그룹 제작**: 함께 공유하고 싶은 사람들을 모아 커스텀 그룹을 만들고 관리합니다.
+
+### 5. 데이터 무결성 및 보안
+- **수정 제약**: 답변의 맥락을 유지하기 위해 질문 내용은 수정이 불가능하며, 오직 답변과 공개 범위만 수정할 수 있습니다.
+- **기본 질문 보호**: 서비스의 근간이 되는 70개의 시스템 질문은 삭제나 변경이 불가능하도록 DB 레벨에서 보호됩니다.
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js (App Router), React, Tailwind CSS, Framer Motion
+- **Backend/DB**: Supabase (PostgreSQL, Auth, Storage)
+- **Icons**: Lucide React
+- **Deployment**: Vercel
+
+---
+
+## 🚀 시작하기
+
+### 환경 변수 설정
+`.env.local` 파일을 루트 디렉토리에 생성하고 아래 정보를 입력하세요.
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 설치 및 실행
+```bash
+# 의존성 설치
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 개발 서버 실행
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📸 주요 화면
+- **홈**: 나의 기록 현황 확인 및 자서전 감상
+- **탐색**: 새로운 인연 찾기 및 팔로우
+- **프로필**: 나의 통계 관리 및 타인의 자서전 방문
+- **그룹**: 소중한 사람들과의 공유 그룹 관리
