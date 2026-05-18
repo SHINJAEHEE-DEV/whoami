@@ -104,15 +104,6 @@ export default function Home() {
               </div>
             )}
           </div>
-          
-          <div className="flex justify-center mt-10">
-            <button 
-              onClick={() => router.push('/records/new')}
-              className="px-8 py-4 bg-brand-primary text-white rounded-full font-black text-base shadow-lg hover-mongle"
-            >
-              ✨ 새로운 기록 남기기
-            </button>
-          </div>
         </div>
       </main>
 
